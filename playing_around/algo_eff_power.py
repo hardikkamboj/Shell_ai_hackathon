@@ -371,7 +371,7 @@ def totalAEP(turb_diam, turb_coords, power_curve, wind_inst_freq,debug = False):
     
     # Looping over every wind instance and calc Power
     # set disable=True for disabling progressbar
-    for i in tqdm(range(n_slices_drct), disable=False):
+    for i in range(n_slices_drct):
         for j in range(n_slices_sped): 
             
             # take the mid value as effective speed
@@ -459,12 +459,12 @@ def checkConstraints(turb_coords, turb_diam):
           print('Somewhere perimeter constraint is violated\n')
     elif peri_constr_viol == False and prox_constr_viol == True:
           print('Somewhere proximity constraint is violated\n')
-    else: print('Both perimeter and proximity constraints are satisfied !!\n')
+    # else: print('Both perimeter and proximity constraints are satisfied !!\n')
         
     return()
     
 
-if __name__ == "__main__":
+def get_eff_power(coords_file,power_curve_file,wind_data):
     
     # Turbine Specifications.
     # -**-SHOULD NOT BE MODIFIED-**-
@@ -484,14 +484,14 @@ if __name__ == "__main__":
     
     
     # Turbine x,y coordinates
-    turb_coords    =  getTurbLoc(r'..\Shell_Hackathon Dataset\turbine_loc_test.csv')
+    turb_coords    =  getTurbLoc(coords_file)
     
     # Load the power curve
-    power_curve    =  loadPowerCurve('..\Shell_Hackathon Dataset\power_curve.csv')
+    power_curve    =  loadPowerCurve(power_curve_file)
     
     # Pass wind data csv file location to function binWindResourceData.
     # Retrieve probabilities of wind instance occurence.
-    wind_inst_freq =  binWindResourceData(r'..\Shell_Hackathon Dataset\Wind Data\wind_data_2007.csv')
+    wind_inst_freq =  binWindResourceData(wind_data)
     
     # check if there is any constraint is violated before we do anything. Comment 
     # out the function call to checkConstraints below if you desire. Note that 
@@ -499,6 +499,8 @@ if __name__ == "__main__":
     # which the constraints are violated if any. 
     checkConstraints(turb_coords, turb_diam)
      
-    print('Calculating AEP......')
+    # print('Calculating AEP......')
     AEP,farm_pwr,total_eff_pwr = totalAEP(turb_diam, turb_coords, power_curve, wind_inst_freq,debug = True) 
-    print('Total power produced by the wind farm is: ', "%.12f"%(AEP), 'GWh')
+    # print('Total power produced by the wind farm is: ', "%.12f"%(AEP), 'GWh')
+    total_eff_pwr = np.mean(total_eff_pwr,axis = 0)
+    return AEP,farm_pwr,total_eff_pwr
